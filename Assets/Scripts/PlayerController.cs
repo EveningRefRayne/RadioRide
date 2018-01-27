@@ -106,7 +106,7 @@ public class PlayerController : MonoBehaviour
                 jumpCD = 30;
                 phys.AddForce(Vector2.up * jumpPower,ForceMode2D.Impulse);
                 anim.SetInteger("animState", 3);//ascend
-                Debug.Log("Should be 3: " + anim.GetInteger("animState"));
+                //Debug.Log("Should be 3: " + anim.GetInteger("animState"));
                 //Do the jump animation
             }
             if (Input.GetAxis("Vertical") > 0)
@@ -120,9 +120,9 @@ public class PlayerController : MonoBehaviour
                     if (preJump == false)
                     {
                         preJump = true;
-                        Debug.Log("Jump Pressed, jumping prep");
+                        //Debug.Log("Jump Pressed, jumping prep");
                         anim.SetInteger("animState", 3);//ascend
-                        Debug.Log("Anim State: " + anim.GetInteger("animState"));
+                        //Debug.Log("Anim State: " + anim.GetInteger("animState"));
                         //Do the prejump animation
                     }
                 }
@@ -135,7 +135,7 @@ public class PlayerController : MonoBehaviour
         if(phys.velocity.y<0)
         {
             phys.AddForce(new Vector2(0, -18f * phys.mass));
-            Debug.Log("Falling, trigger falling anim");
+            //Debug.Log("Falling, trigger falling anim");
             anim.SetInteger("animState", 4);//descend
             //Do the falling animation
         }
@@ -152,7 +152,7 @@ public class PlayerController : MonoBehaviour
             {
                 if(point.point.y<(transform.position.y-GetComponent<SpriteRenderer>().bounds.extents.y*0.9f))
                 {
-                    Debug.Log("The point: " + point.point + " Is below: " + (transform.position.y - GetComponent<SpriteRenderer>().bounds.extents.y * 0.9f));
+                    //Debug.Log("The point: " + point.point + " Is below: " + (transform.position.y - GetComponent<SpriteRenderer>().bounds.extents.y * 0.9f));
                     isAbove = true;
                     canJump = true;
                     if(Input.GetAxis("Horizontal")!=0)
@@ -180,12 +180,4 @@ public class PlayerController : MonoBehaviour
             anim.SetInteger("animState", 4);//descend
         }
     }
-
-
-}
-		if (inWifiRange) {
-			phys.velocity = new Vector2 (Mathf.Lerp (phys.velocity.x, Input.GetAxis ("horizontal"), accelTime) * moveSpeed,
-				Mathf.Lerp (phys.velocity.y, Input.GetAxis ("vertical"), accelTime) * moveSpeed);
-		} 
-	}
 }
