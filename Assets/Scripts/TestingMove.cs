@@ -23,7 +23,7 @@ public class TestingMove : MonoBehaviour {
 			this.transform.position = new Vector3 (this.transform.position.x + speed * Input.GetAxis ("Horizontal"), this.transform.position.y, this.transform.position.z);
 		}
 			
-		if (Input.GetAxis ("Fire1") >= 0.001) {
+		if (Input.GetAxis ("Interact") >= 0.001) {
 			Debug.Log ("KeyPressed");
 			if (!selectIsDown && overJammer) {
 				selectIsDown = true;
