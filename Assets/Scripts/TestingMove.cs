@@ -7,16 +7,21 @@ public enum PlayerState{
 	Controllable,
 	Transition1,
 	Transition2,
-	Transition3
+	Transition3,
+	Transition4,
+	Transition5,
+	Dying
 }
 
 public class TestingMove : MonoBehaviour {
 
 	public Transform startPoint;
 	public float speed = 0.5f;
-	public float transitionTime = 0.5f;
-	public Animation transitionAnimation;
-
+	public float enterDishTime = 0.5f;
+	public float transmissionTime = 1.0f;
+	public float deathTime = 1.0f;
+	public Animator animator;
+	//public GameObject playerSprite;
 
 	private GameDriver gameDriver;
 	private PlayerState state = PlayerState.Controllable;
@@ -31,8 +36,11 @@ public class TestingMove : MonoBehaviour {
 
 	private float transitionStartDistance;
 	private Vector3 transitionEndPos;
+	private bool doneMoving = true;
 	private float transitionTravelDis;
 	private float scaleFactor = 1f;
+
+	private float deathTimer = 0f;
 
 	// Use this for initialization
 	void Start () {
@@ -53,9 +61,10 @@ public class TestingMove : MonoBehaviour {
 					Debug.Log ("KeyPressed");
 					selectIsDown = true;
 					if (inTransitionRange) {
+						Debug.Log ("TRNAS");
 						transitionEndPos = dish.inPoint.position;
 						transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
-						transitionTravelDis = transitionStartDistance / transitionTime;
+						transitionTravelDis = transitionStartDistance / enterDishTime;
 						state = PlayerState.Transition1;
 					} else if (overJammer) {
 						jammer.FlipSwitch ();
@@ -67,33 +76,69 @@ public class TestingMove : MonoBehaviour {
 			break;
 
 		case PlayerState.Transition1:
-			this.transform.position = Vector3.MoveTowards (this.transform.position, transitionEndPos, transitionTravelDis * Time.deltaTime);
+			this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos, transitionTravelDis * Time.deltaTime);
 			scaleFactor = Mathf.Max (0.25f, Vector3.Distance (this.transform.position, transitionEndPos) / transitionStartDistance);
 			this.transform.localScale = new Vector3 (scaleFactor, scaleFactor, 1);
 			if (this.transform.position == transitionEndPos) {
-				this.transform.parent = dish.transform;
+				transitionEndPos = dish.outPoint.position;
+				transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
+				transitionTravelDis = transitionStartDistance / enterDishTime;
 				state = PlayerState.Transition2;
-				transitionAnimation.Play ();
+				//animator.Play ();
 			}
 			break;
 
 		case PlayerState.Transition2:
-			if (!transitionAnimation.isPlaying) {
-				this.transform.parent = null;
-				this.transform.position = dish.inPoint.position;
-				transitionEndPos = dish.outPoint.position;
-				transitionStartDistance = Vector2.Distance (this.transform.position, transitionEndPos);
-				transitionTravelDis = transitionStartDistance / transitionTime;
+			this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos , transitionTravelDis * Time.deltaTime);
+			this.transform.position = new Vector3 (transform.position.x, transform.position.y, 1f);
+			if ((Vector2)this.transform.position == (Vector2)transitionEndPos) {
+				transitionEndPos = dish.transPoint.position;
+				transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
+				transitionTravelDis = transitionStartDistance / transmissionTime ;
 				state = PlayerState.Transition3;
 			}
 			break;
+			
 
 		case PlayerState.Transition3:
-			this.transform.position = Vector3.MoveTowards (this.transform.position, transitionEndPos, transitionTravelDis * Time.deltaTime);
-			scaleFactor = Mathf.Min (1, 1 - (Vector3.Distance (this.transform.position, transitionEndPos) / transitionStartDistance));
+			this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos, transitionTravelDis * Time.deltaTime);
+			this.transform.position = new Vector3 (transform.position.x, transform.position.y, 1f);
+			if ((Vector2)this.transform.position == (Vector2)transitionEndPos) {
+				transitionEndPos = dish.inPoint.position;
+				transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
+				transitionTravelDis = transitionStartDistance / enterDishTime;
+				state = PlayerState.Transition4;
+			}
+			break;
+
+		case PlayerState.Transition4:
+			this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos, transitionTravelDis * Time.deltaTime);
+			this.transform.position = new Vector3 (transform.position.x, transform.position.y, 1f);
+			if ((Vector2)this.transform.position == (Vector2)transitionEndPos){
+				transitionEndPos = dish.outPoint.position;
+				transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
+				transitionTravelDis = transitionStartDistance / enterDishTime;
+				this.transform.position = new Vector3 (transform.position.x, transform.position.y, 0f);
+				state = PlayerState.Transition5;
+			}
+			break;
+
+
+		case PlayerState.Transition5:
+			this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos, transitionTravelDis * Time.deltaTime);
+			scaleFactor = Mathf.Min (1, 1 - Vector3.Distance (this.transform.position, transitionEndPos) / transitionStartDistance);
 			this.transform.localScale = new Vector3 (scaleFactor, scaleFactor, 1);
 			if (this.transform.position == transitionEndPos) {
 				gameDriver.GoToNextLevel ();
+			}
+			break;
+
+		case PlayerState.Dying:
+			if (deathTimer > 0) {
+				gameObject.GetComponent<SpriteRenderer>().color = Color.Lerp(Color.red, Color.white, deathTimer%0.5f);
+				deathTimer -= Time.deltaTime;
+			} else {
+				gameDriver.ReloadLevel ();
 			}
 			break;
 			
@@ -132,6 +177,13 @@ public class TestingMove : MonoBehaviour {
 			this.gameObject.GetComponent<SpriteRenderer> ().color = Color.cyan;
 		} else {
 			this.gameObject.GetComponent<SpriteRenderer> ().color = Color.white;
+		}
+	}
+
+	void OnTriggerEnter2D(Collider2D other){
+		if (other.gameObject.tag == "MagneticField") {
+			deathTimer = deathTime;
+			state = PlayerState.Dying;
 		}
 	}
 }

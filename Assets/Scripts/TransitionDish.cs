@@ -6,7 +6,8 @@ using UnityEngine.SceneManagement;
 public class TransitionDish : MonoBehaviour {
 
 	public Transform inPoint;
-	public Transform  outPoint;
+	public Transform outPoint;
+	public Transform transPoint;
 
 
 	private bool playerInRange = false;
