@@ -5,13 +5,18 @@ using UnityEngine.SceneManagement;
 
 public class TransitionDish : MonoBehaviour {
 
-	public Scene nextLevel;
+	public Transform inPoint;
+	public Transform  outPoint;
+
+	public Vector3 inPos;
+	public Vector3 outPos;
 
 	private bool playerInRange = false;
 
 	// Use this for initialization
 	void Start () {
-		
+		inPos = inPoint.position;
+		outPos = outPoint.position;
 	}
 	
 	// Update is called once per frame
