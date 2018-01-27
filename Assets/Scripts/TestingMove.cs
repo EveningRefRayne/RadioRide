@@ -45,15 +45,17 @@ public class TestingMove : MonoBehaviour {
 				this.transform.position = new Vector3 (this.transform.position.x + speed * Input.GetAxis ("Horizontal"), this.transform.position.y, this.transform.position.z);
 			}
 
-			if (Input.GetAxis ("Interact") >= 0.001 && !selectIsDown) {
-				Debug.Log ("KeyPressed");
-				selectIsDown = true;
-				if (inTransitionRange) {
-					transitionEndPos = dish.inPos;
-					transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
-					state = PlayerState.Transition1;
-				} else if (overJammer) {
+			if (Input.GetAxis ("Interact") > 0) {
+				if (!selectIsDown) {
+					Debug.Log ("KeyPressed");
 					selectIsDown = true;
+					if (inTransitionRange) {
+						transitionEndPos = dish.inPos;
+						transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
+						state = PlayerState.Transition1;
+					} else if (overJammer) {
+						jammer.FlipSwitch ();
+					}
 				}
 			} else {
 				selectIsDown = false;

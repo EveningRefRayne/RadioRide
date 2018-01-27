@@ -5,10 +5,22 @@ using UnityEngine.SceneManagement;
 
 public class GameDriver : MonoBehaviour {
 
+	private static GameDriver _gameDriver;
+
 	public string[] levels;
 	public int currentLevel = 0;
 
-	private bool resetPressed = false;
+	private static bool resetPressed = false;
+	private static float buttonBuffer = 0.5f;
+	private static float bufferTimer = 0f;
+
+	void Awake(){
+		if (!_gameDriver) {
+			_gameDriver = this;
+		} else {
+			GameObject.Destroy (this.gameObject);
+		}
+	}
 
 	// Use this for initialization
 	void Start () {
@@ -17,14 +29,17 @@ public class GameDriver : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (!resetPressed) {
-			if (Input.GetAxis ("Reset") > 0) {
+		if (Input.GetAxis ("Reset") > 0) {
+			if (!resetPressed) {
 				resetPressed = true;
+				bufferTimer = buttonBuffer;
 				ReloadLevel ();
-					
 			}
 		} else {
-			resetPressed = false;
+			bufferTimer -= Time.deltaTime;
+			if (bufferTimer <= 0) {
+				resetPressed = false;
+			}
 		}
 
 	}
