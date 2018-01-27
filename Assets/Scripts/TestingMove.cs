@@ -12,8 +12,9 @@ public enum PlayerState{
 
 public class TestingMove : MonoBehaviour {
 
+	public Transform startPoint;
 	public float speed = 0.5f;
-	public float transitionSpeed = 0.5f;
+	public float transitionTime = 0.5f;
 	public Animation transitionAnimation;
 
 
@@ -30,10 +31,12 @@ public class TestingMove : MonoBehaviour {
 
 	private float transitionStartDistance;
 	private Vector3 transitionEndPos;
+	private float transitionTravelDis;
 	private float scaleFactor = 1f;
 
 	// Use this for initialization
 	void Start () {
+		this.transform.position = startPoint.position;
 		gameDriver = GameObject.FindGameObjectWithTag ("GameController").GetComponent<GameDriver> ();
 	}
 	
@@ -50,8 +53,9 @@ public class TestingMove : MonoBehaviour {
 					Debug.Log ("KeyPressed");
 					selectIsDown = true;
 					if (inTransitionRange) {
-						transitionEndPos = dish.inPos;
+						transitionEndPos = dish.inPoint.position;
 						transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
+						transitionTravelDis = transitionStartDistance / transitionTime;
 						state = PlayerState.Transition1;
 					} else if (overJammer) {
 						jammer.FlipSwitch ();
@@ -63,7 +67,7 @@ public class TestingMove : MonoBehaviour {
 			break;
 
 		case PlayerState.Transition1:
-			this.transform.position = Vector3.MoveTowards (this.transform.position, transitionEndPos, transitionSpeed * Time.deltaTime);
+			this.transform.position = Vector3.MoveTowards (this.transform.position, transitionEndPos, transitionTravelDis * Time.deltaTime);
 			scaleFactor = Mathf.Max (0.25f, Vector3.Distance (this.transform.position, transitionEndPos) / transitionStartDistance);
 			this.transform.localScale = new Vector3 (scaleFactor, scaleFactor, 1);
 			if (this.transform.position == transitionEndPos) {
@@ -76,15 +80,16 @@ public class TestingMove : MonoBehaviour {
 		case PlayerState.Transition2:
 			if (!transitionAnimation.isPlaying) {
 				this.transform.parent = null;
-				this.transform.position = dish.inPos;
-				transitionEndPos = dish.outPos;
+				this.transform.position = dish.inPoint.position;
+				transitionEndPos = dish.outPoint.position;
 				transitionStartDistance = Vector2.Distance (this.transform.position, transitionEndPos);
+				transitionTravelDis = transitionStartDistance / transitionTime;
 				state = PlayerState.Transition3;
 			}
 			break;
 
 		case PlayerState.Transition3:
-			this.transform.position = Vector3.MoveTowards (this.transform.position, transitionEndPos, transitionSpeed * Time.deltaTime);
+			this.transform.position = Vector3.MoveTowards (this.transform.position, transitionEndPos, transitionTravelDis * Time.deltaTime);
 			scaleFactor = Mathf.Min (1, 1 - (Vector3.Distance (this.transform.position, transitionEndPos) / transitionStartDistance));
 			this.transform.localScale = new Vector3 (scaleFactor, scaleFactor, 1);
 			if (this.transform.position == transitionEndPos) {
