@@ -8,7 +8,7 @@ public class TestingMove : MonoBehaviour {
 	public float speed = 0.5f;
 	public Animation transitionAnimation;
 
-
+	private GameDriver gameDriver;
 	private bool inSignal = false;
 	private bool overJammer = false;
 	private Jammer jammer;
@@ -19,12 +19,13 @@ public class TestingMove : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
+		gameDriver = GameObject.FindGameObjectWithTag ("GameController").GetComponent<GameDriver> ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		if (!isTransitioning) {
+
 			if (Input.GetAxis ("Horizontal") >= 0.001 || Input.GetAxis ("Horizontal") <= -0.001) {
 				this.transform.position = new Vector3 (this.transform.position.x + speed * Input.GetAxis ("Horizontal"), this.transform.position.y, this.transform.position.z);
 			}
@@ -44,7 +45,7 @@ public class TestingMove : MonoBehaviour {
 			}
 		} else {
 			if (!transitionAnimation.isPlaying) {
-				SceneManager.LoadScene ("DummyScene");
+				gameDriver.GoToNextLevel ();
 			}
 		}
 
