@@ -183,3 +183,9 @@ public class PlayerController : MonoBehaviour
 
 
 }
+		if (inWifiRange) {
+			phys.velocity = new Vector2 (Mathf.Lerp (phys.velocity.x, Input.GetAxis ("horizontal"), accelTime) * moveSpeed,
+				Mathf.Lerp (phys.velocity.y, Input.GetAxis ("vertical"), accelTime) * moveSpeed);
+		} 
+	}
+}
