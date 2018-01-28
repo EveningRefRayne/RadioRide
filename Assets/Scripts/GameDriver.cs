@@ -38,6 +38,9 @@ public class GameDriver : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if(Input.GetKey(KeyCode.Escape)){
+			Application.Quit();
+		}
 		if (Input.GetAxis ("Reset") > 0) {
 			if (!resetPressed) {
 				resetPressed = true;
