@@ -179,12 +179,15 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-		if (state == PlayerState.Controllable) {
-			if (jumpCD > 0) jumpCD--;
+		if (state == PlayerState.Controllable)
+        {
+            if(phys.velocity.x>0)GetComponent<SpriteRenderer>().flipX = true;
+            if (phys.velocity.x < 0) GetComponent<SpriteRenderer>().flipX = false;
+            if (jumpCD > 0) jumpCD--;
 			if (inWifiRange)
 			{
-				phys.velocity = new Vector2(Mathf.Lerp(phys.velocity.x, Input.GetAxis("Horizontal"), accelTime) * wifiSpeed,
-					Mathf.Lerp(phys.velocity.y, Input.GetAxis("Vertical"), accelTime) * wifiSpeed)*Time.deltaTime;
+				phys.velocity = new Vector2(Mathf.Lerp(phys.velocity.x, Input.GetAxis("Horizontal")*wifiSpeed, accelTime),
+					Mathf.Lerp(phys.velocity.y, Input.GetAxis("Vertical")*wifiSpeed, accelTime));
 				if (phys.velocity.y >= 0)
 				{
 					anim.SetInteger("animState", 3);//ascend
@@ -299,6 +302,7 @@ public class PlayerController : MonoBehaviour
 	public void SetSwitch(EmiterSwitch targetSwitch){
 		Debug.Log ("Over switch");
 		overSwitch = true;
+        
 		eSwitch = targetSwitch;
 	}
 
@@ -316,9 +320,11 @@ public class PlayerController : MonoBehaviour
 			if (!inTransitionRange) {
 				if (isIn) {
 					this.gameObject.GetComponent<SpriteRenderer> ().color = Color.cyan;
-				} else {
+                    GetComponent<Rigidbody2D>().gravityScale = 0.1f;
+                } else {
 					this.gameObject.GetComponent<SpriteRenderer> ().color = Color.white;
-				}
+                    GetComponent<Rigidbody2D>().gravityScale = 1;
+                }
 			}
 		}
 	}
@@ -371,7 +377,7 @@ public class PlayerController : MonoBehaviour
             ContactPoint2D[] points = collision.contacts;
             foreach(ContactPoint2D point in points)
             {
-                if(point.point.y<(transform.position.y-GetComponent<SpriteRenderer>().bounds.extents.y*0.9f))
+                if(point.point.y<(transform.position.y-GetComponent<SpriteRenderer>().bounds.extents.y*0.5f))
                 {
                     //Debug.Log("The point: " + point.point + " Is below: " + (transform.position.y - GetComponent<SpriteRenderer>().bounds.extents.y * 0.9f));
                     isAbove = true;

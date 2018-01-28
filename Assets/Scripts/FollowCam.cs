@@ -53,19 +53,19 @@ public class FollowCam : MonoBehaviour {
 		}
 		else
 		{
-			velocityOffset.x = Mathf.Lerp (velocityOffset.x, poi.GetComponent<Rigidbody2D> ().velocity.x * .75f, velocityEase);
+			velocityOffset.x = Mathf.Lerp (velocityOffset.x, poi.GetComponent<Rigidbody2D> ().velocity.x * 0.75f, velocityEase);
 			velocityOffset.y = Mathf.Lerp (velocityOffset.y, poi.GetComponent<Rigidbody2D> ().velocity.y * 0.5f, velocityEase);
 			lookAhead = poi.transform.position;
 			lookAhead += velocityOffset;
 			groundBias = 1 / (1 + Mathf.Exp (-0.1f * (GetComponent<Camera> ().orthographicSize - 10)));
-			if (groundBias < -4)	groundBias = -4;
+			if (groundBias < .2)	groundBias = .2f;
 			lookAhead.y = Mathf.Lerp (lookAhead.y, (poi.transform.position.y / 3) * 2, groundBias);
 			destination = Vector3.Lerp (transform.position, lookAhead, ease);
 			destination.x = Mathf.Max (minXY.x, destination.x);
 			destination.y = Mathf.Max (minXY.y, destination.y);
 		}
         destination.z = camZ;
-        GetComponent<Camera>().orthographicSize = Mathf.Clamp(velocityOffset.magnitude/3,5,15) + 5;
+        GetComponent<Camera>().orthographicSize = Mathf.Clamp(velocityOffset.magnitude/3 + 5,5,15) + 5;
         transform.position = destination;
     }
 }
