@@ -36,6 +36,9 @@ public class Jammer : MonoBehaviour {
 	}
 
 	public static List<Jammer> FindJammersById(int jammerId){
+		if (GameObject.FindGameObjectsWithTag ("Jammer").Length == 0) {
+			return new List<Jammer>();
+		}
 		GameObject[] jammerObjects = GameObject.FindGameObjectsWithTag ("Jammer");
 		List<Jammer> jammers = new List<Jammer>();
 		Debug.Log (jammerObjects.Length);

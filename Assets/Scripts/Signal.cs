@@ -37,6 +37,9 @@ public class Signal : MonoBehaviour {
 	}
 
 	public static List<Signal> FindSignalsById(int signalId){
+		if (GameObject.FindGameObjectsWithTag ("Signal").Length == 0) {
+			return new List<Signal>();
+		}
 		GameObject[] signalObjects = GameObject.FindGameObjectsWithTag ("Signal");
 		List<Signal> signals = new List<Signal>();
 		Debug.Log (signalObjects.Length);
