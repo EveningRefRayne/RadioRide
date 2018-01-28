@@ -8,11 +8,14 @@ public class FollowCam : MonoBehaviour {
     public float velocityEase = 0.05f;
     public bool wtfIsThis2;
 
-	public Rect bounds;
+	public float minX;
+	//public float maxX;
+	public float minY;
+	//public float maxY;
 
 
     private Vector3 lookAhead;
-    private Vector2 minXY = new Vector2(-30, -30);
+	private Vector2 minXY;
     public GameObject poi;
     private float camZ;
     private Vector3 velocityOffset = Vector3.zero;
@@ -21,8 +24,12 @@ public class FollowCam : MonoBehaviour {
 
     void Awake()
     {
+		minXY = new Vector2(minX, minY);
         S = this;
         camZ = transform.position.z;
+		//GameObject.DontDestroyOnLoad (gameObject);
+		//Camera.main.GetComponent<FollowCam> ().enabled = true;
+		//Camera.main.transform.parent = null;
     }
 
     void FixedUpdate()
@@ -58,7 +65,7 @@ public class FollowCam : MonoBehaviour {
 			destination.y = Mathf.Max (minXY.y, destination.y);
 		}
         destination.z = camZ;
-        GetComponent<Camera>().orthographicSize = Mathf.Clamp(velocityOffset.magnitude/3,5,15);
+        GetComponent<Camera>().orthographicSize = Mathf.Clamp(velocityOffset.magnitude/3,5,15) + 5;
         transform.position = destination;
     }
 }

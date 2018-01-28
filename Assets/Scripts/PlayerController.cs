@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
 
 	//Gamedriver and State
 	private GameDriver gameDriver;
-	private PlayerState state = PlayerState.Controllable;
+	public PlayerState state = PlayerState.Controllable;
 
 	//switch
 	private bool overSwitch = false;
@@ -56,7 +56,9 @@ public class PlayerController : MonoBehaviour
 	private bool selectIsDown = false;
 
 	//animation
-	private float transitionStartDistance;
+	private Vector3 transitionStartPos;
+	private float transTimer;
+	private float lerpRate = 1f;
 	private Vector3 transitionEndPos;
 	private bool doneMoving = true;
 	private float transitionTravelDis;
@@ -68,9 +70,12 @@ public class PlayerController : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
+		//GameObject.DontDestroyOnLoad (gameObject);
+
 		if (startPoint != null) {
 			this.transform.position = startPoint.position;
 		}
+
 		gameDriver = GameObject.FindGameObjectWithTag ("GameController").GetComponent<GameDriver> ();
         //phys = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
@@ -85,9 +90,11 @@ public class PlayerController : MonoBehaviour
 					selectIsDown = true;
 					if (inTransitionRange) {
 						Debug.Log ("TRNAS");
+						phys.velocity = Vector2.zero;
+						phys.gravityScale = 0;
 						transitionEndPos = dish.inPoint.position;
-						transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
-						transitionTravelDis = transitionStartDistance / enterDishTime;
+						transitionStartPos = transform.position;
+						transTimer = enterDishTime;
 						state = PlayerState.Transition1;
 					} else if (overSwitch) {
 						eSwitch.FlipSwitch ();
@@ -99,60 +106,96 @@ public class PlayerController : MonoBehaviour
 			break;
 
 		case PlayerState.Transition1:
-			this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos, transitionTravelDis * Time.deltaTime);
-			scaleFactor = Mathf.Max (0.25f, Vector3.Distance (this.transform.position, transitionEndPos) / transitionStartDistance);
-			this.transform.localScale = new Vector3 (scaleFactor, scaleFactor, 1);
+			lerpRate = Mathf.Min(1f, 1f - transTimer / enterDishTime);
+			this.transform.position = new Vector3 (Mathf.Lerp (transitionStartPos.x, transitionEndPos.x, lerpRate), Mathf.Lerp (transitionStartPos.y, transitionEndPos.y, lerpRate), 0);
+			//scaleFactor = Mathf.Max (0.25f, Vector3.Distance (this.transform.position, transitionEndPos) / transitionStartDistance);
+			//this.transform.localScale = new Vector3 (scaleFactor, scaleFactor, 1f);
 			if (this.transform.position == transitionEndPos) {
 				transitionEndPos = dish.outPoint.position;
-				transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
-				transitionTravelDis = transitionStartDistance / enterDishTime;
+				transitionStartPos = transform.position;
+				//transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
+				//transitionTravelDis = transitionStartDistance / enterDishTime;
+				transTimer = enterDishTime;
 				state = PlayerState.Transition2;
 				//animator.Play ();
+			} else {
+				transTimer -= Time.deltaTime;
 			}
 			break;
 
 		case PlayerState.Transition2:
-			this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos , transitionTravelDis * Time.deltaTime);
-			this.transform.position = new Vector3 (transform.position.x, transform.position.y, 1f);
+			lerpRate = Mathf.Min(1f, 1f - transTimer / enterDishTime);
+			this.transform.position = new Vector3 (Mathf.Lerp (transitionStartPos.x, transitionEndPos.x, lerpRate), Mathf.Lerp (transitionStartPos.y, transitionEndPos.y, lerpRate), 0);
+			//this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos , transitionTravelDis * Time.deltaTime);
+			//this.transform.position = new Vector3 (transform.position.x, transform.position.y, 1f);
 			if ((Vector2)this.transform.position == (Vector2)transitionEndPos) {
 				transitionEndPos = dish.transPoint.position;
-				transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
-				transitionTravelDis = transitionStartDistance / transmissionTime ;
+				transitionStartPos = transform.position;
+				//transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
+				//transitionTravelDis = transitionStartDistance / transmissionTime ;
+				//Camera.main.GetComponent<FollowCam> ().enabled = false;
+				transTimer = transmissionTime;
 				state = PlayerState.Transition3;
+			}
+			else {
+				transTimer -= Time.deltaTime;
 			}
 			break;
 
 
 		case PlayerState.Transition3:
-			this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos, transitionTravelDis * Time.deltaTime);
-			this.transform.position = new Vector3 (transform.position.x, transform.position.y, 1f);
+			lerpRate = Mathf.Min(1f, 1f - transTimer / transmissionTime);
+			this.transform.position = new Vector3 (Mathf.Lerp (transitionStartPos.x, transitionEndPos.x, lerpRate), Mathf.Lerp (transitionStartPos.y, transitionEndPos.y, lerpRate), 0);
+			//this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos, transitionTravelDis * Time.deltaTime);
+			//this.transform.position = new Vector3 (transform.position.x, transform.position.y, 2f);
 			if ((Vector2)this.transform.position == (Vector2)transitionEndPos) {
 				transitionEndPos = dish.inPoint.position;
-				transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
-				transitionTravelDis = transitionStartDistance / enterDishTime;
+				transitionStartPos = transform.position;
+				//transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
+				//transitionTravelDis = transitionStartDistance / enterDishTime;
+				transTimer = enterDishTime;
 				state = PlayerState.Transition4;
+			}
+			else{
+				transTimer -= Time.deltaTime;
 			}
 			break;
 
 		case PlayerState.Transition4:
-			this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos, transitionTravelDis * Time.deltaTime);
-			this.transform.position = new Vector3 (transform.position.x, transform.position.y, 1f);
+			lerpRate = Mathf.Min(1, 1 - transTimer / enterDishTime);
+			this.transform.position = new Vector3 (Mathf.Lerp (transitionStartPos.x, transitionEndPos.x, lerpRate), Mathf.Lerp (transitionStartPos.y, transitionEndPos.y, lerpRate), 0);
+			//this.transform.position = new Vector3 (transform.position.x, transform.position.y, 1f);
 			if ((Vector2)this.transform.position == (Vector2)transitionEndPos){
 				transitionEndPos = dish.outPoint.position;
-				transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
-				transitionTravelDis = transitionStartDistance / enterDishTime;
-				this.transform.position = new Vector3 (transform.position.x, transform.position.y, 0f);
+				transitionStartPos = transform.position;
+				//transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
+				//transitionTravelDis = transitionStartDistance / enterDishTime;
+				//this.transform.position = new Vector3 (transform.position.x, transform.position.y, 0f);
+				transTimer = enterDishTime;
 				state = PlayerState.Transition5;
+			}
+			else{
+				transTimer -= Time.deltaTime;
 			}
 			break;
 
 
 		case PlayerState.Transition5:
-			this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos, transitionTravelDis * Time.deltaTime);
-			scaleFactor = Mathf.Min (1, 1 - Vector3.Distance (this.transform.position, transitionEndPos) / transitionStartDistance);
-			this.transform.localScale = new Vector3 (scaleFactor, scaleFactor, 1);
+			lerpRate = Mathf.Min (1, 1 - transTimer / enterDishTime);
+			this.transform.position = new Vector3 (Mathf.Lerp (transitionStartPos.x, transitionEndPos.x, lerpRate), Mathf.Lerp (transitionStartPos.y, transitionEndPos.y, lerpRate), 0);
+			//this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos, transitionTravelDis * Time.deltaTime);
+			//scaleFactor = 0.4f; //Mathf.Min (0.4f, (1 - Vector3.Distance (this.transform.position, transitionEndPos) / transitionStartDistance)*0.4f);
+			//this.transform.localScale = new Vector3 (scaleFactor, scaleFactor, 1);
 			if (this.transform.position == transitionEndPos) {
+				//phys.gravityScale = 1;
+				//state = PlayerState.Controllable;
 				gameDriver.GoToNextLevel ();
+				//transform.position = GameObject.FindGameObjectWithTag ("StartPos").transform.position;
+				//Camera.main.transform.parent = null;
+				//Camera.main.GetComponent<FollowCam> ().enabled = true;
+			}
+			else{
+				transTimer -= Time.deltaTime;
 			}
 			break;
 
@@ -171,7 +214,6 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-		Debug.Log (phys.velocity);
 		if (state == PlayerState.Controllable) {
 			if (jumpCD > 0) jumpCD--;
 			if (inWifiRange)
@@ -330,14 +372,12 @@ public class PlayerController : MonoBehaviour
 		state = PlayerState.Dying;
 	}
 
-	/*
+
 	void OnTriggerEnter2D(Collider2D other){
-		if (other.gameObject.tag == "Jammer") {
-			deathTimer = deathTime;
-			state = PlayerState.Dying;
+		if (other.gameObject.tag == "DeathBox") {
+			gameDriver.ReloadLevel ();
 		}
 	}
-	*/
 
 	void OnTriggerExit2D(Collider2D other){
 		if (other.gameObject.tag == "Signal") {
