@@ -3,18 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public enum PlayerState{
-	Controllable,
-	Transition1,
-	Transition2,
-	Transition3,
-	Transition4,
-	Transition5,
-	Dying
-}
-
 public class TestingMove : MonoBehaviour {
-
+	/*
 	public Transform startPoint;
 	public float speed = 0.5f;
 	public float enterDishTime = 0.5f;
@@ -185,5 +175,5 @@ public class TestingMove : MonoBehaviour {
 			deathTimer = deathTime;
 			state = PlayerState.Dying;
 		}
-	}
+	}*/
 }

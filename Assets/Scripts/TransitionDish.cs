@@ -24,14 +24,14 @@ public class TransitionDish : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D other){
 		if (other.gameObject.tag == "Player") {
 			//TODO: replace with player script
-			other.gameObject.GetComponent<TestingMove>().SetInTransitionRange(true, this);
+			other.gameObject.GetComponent<PlayerController>().SetInTransitionRange(true, this);
 		}
 	}
 
 	void OnTriggerExit2D(Collider2D other){
 		if (other.gameObject.tag == "Player") {
 			//TODO: replace with player script
-			other.gameObject.GetComponent<TestingMove>().SetInTransitionRange(false, this);
+			other.gameObject.GetComponent<PlayerController>().SetInTransitionRange(false, this);
 		}
 	}
 }
