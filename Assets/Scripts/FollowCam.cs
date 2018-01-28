@@ -26,7 +26,6 @@ public class FollowCam : MonoBehaviour {
 	{
 		minXY = new Vector2(minX, minY);
         S = this;
-        gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, -10);
         camZ = transform.position.z;
 		//GameObject.DontDestroyOnLoad (gameObject);
 		//Camera.main.GetComponent<FollowCam> ().enabled = true;
