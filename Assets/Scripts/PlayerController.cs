@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
 	[Header("Movement")]
 	public float jumpPower = 100;
     public float moveSpeed = 10;
+	public float wifiSpeed = 10;
     public float accelTime = 0.1f;
     public bool preJump = false;
     public bool canJump = false;
@@ -170,12 +171,13 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+		Debug.Log (phys.velocity);
 		if (state == PlayerState.Controllable) {
 			if (jumpCD > 0) jumpCD--;
 			if (inWifiRange)
 			{
-				phys.velocity = new Vector2(Mathf.Lerp(phys.velocity.x, Input.GetAxis("Horizontal"), accelTime) * moveSpeed,
-					Mathf.Lerp(phys.velocity.y, Input.GetAxis("Vertical"), accelTime) * moveSpeed)*Time.deltaTime;
+				phys.velocity = new Vector2(Mathf.Lerp(phys.velocity.x, Input.GetAxis("Horizontal"), accelTime) * wifiSpeed,
+					Mathf.Lerp(phys.velocity.y, Input.GetAxis("Vertical"), accelTime) * wifiSpeed)*Time.deltaTime;
 				if (phys.velocity.y >= 0)
 				{
 					anim.SetInteger("animState", 3);//ascend
@@ -314,7 +316,6 @@ public class PlayerController : MonoBehaviour
 		inTransitionRange = isIn;
 		if (isIn) {
 			dish = targetDish;
-			this.gameObject.GetComponent<SpriteRenderer> ().color = Color.blue;
 		} else if (inWifiRange) {
 			this.gameObject.GetComponent<SpriteRenderer> ().color = Color.cyan;
 		} else {
@@ -322,12 +323,21 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	public void Die(){
+		phys.velocity = Vector2.zero;
+		phys.gravityScale = 0;
+		deathTimer = deathTime;
+		state = PlayerState.Dying;
+	}
+
+	/*
 	void OnTriggerEnter2D(Collider2D other){
 		if (other.gameObject.tag == "Jammer") {
 			deathTimer = deathTime;
 			state = PlayerState.Dying;
 		}
 	}
+	*/
 
 	void OnTriggerExit2D(Collider2D other){
 		if (other.gameObject.tag == "Signal") {
@@ -359,7 +369,7 @@ public class PlayerController : MonoBehaviour
                     {
                         anim.SetInteger("animState", 1);//walk
                     }
-                    phys.velocity = Vector2.zero;
+                    //phys.velocity = Vector2.zero;
                     anim.SetInteger("animState", 0);
                     //jumpCD = 0;
                 }

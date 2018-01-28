@@ -8,6 +8,8 @@ public class FollowCam : MonoBehaviour {
     public float velocityEase = 0.05f;
     public bool wtfIsThis2;
 
+	public Rect bounds;
+
 
     private Vector3 lookAhead;
     private Vector2 minXY = new Vector2(-30, -30);

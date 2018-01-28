@@ -6,7 +6,6 @@ public class Signal : MonoBehaviour {
 
 	public int id;
 	public bool active = true;
-	public float radius = 0.8f;
 
 	private CircleCollider2D circleCollider;
 	private bool inRange = false;
@@ -14,7 +13,6 @@ public class Signal : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		circleCollider = this.gameObject.GetComponent<CircleCollider2D> ();
-		circleCollider.radius = radius;
 		circleCollider.enabled = active;
 	}
 	
