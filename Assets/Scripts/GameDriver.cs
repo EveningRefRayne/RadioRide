@@ -59,8 +59,8 @@ public class GameDriver : MonoBehaviour {
 
 	public void GoToNextLevel(){
 		currentLevel++;
-		if (currentLevel >= levelCount) {
-			currentLevel = 0;
+		if (currentLevel > levelCount) {
+			currentLevel = 1;
 			//TODO:load final
 		}
 		SceneManager.LoadScene ("Level" + currentLevel);

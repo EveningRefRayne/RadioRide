@@ -33,10 +33,10 @@ public class EmiterSwitch : MonoBehaviour {
 		Debug.Log ("Flip");
 		active = !active;
 		foreach(Signal sig in Signal.FindSignalsById(id)){
-			sig.SetActive (!active);
+			sig.SetActive (!sig.active);
 		}
 		foreach(Jammer jam in Jammer.FindJammersById(id)){
-			jam.SetActive (!active);
+			jam.SetActive (!jam.active);
 		}
 		if (active) {
 			this.gameObject.GetComponent<SpriteRenderer> ().sprite = onSprite;

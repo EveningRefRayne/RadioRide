@@ -47,10 +47,6 @@ public class Jammer : MonoBehaviour {
 				jammers.Add(jammerObjects [x].GetComponent<Jammer> ());
 			}
 		}
-		foreach (Jammer jam in jammers) {
-			Debug.Log (jam.name + " at " + jam.transform.position);
-		}
-
 		Debug.Log (jammers.Count);
 		return jammers;
 	}
