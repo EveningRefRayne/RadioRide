@@ -64,6 +64,8 @@ public class PlayerController : MonoBehaviour
 	private float transitionTravelDis;
 	private float scaleFactor = 1f;
 	private float deathTimer = 0f;
+
+	private int ignoreExit = 0;
     
 
 
@@ -89,7 +91,7 @@ public class PlayerController : MonoBehaviour
 					Debug.Log ("KeyPressed");
 					selectIsDown = true;
 					if (inTransitionRange) {
-						Debug.Log ("TRNAS");
+						Debug.Log ("TRANSMIT");
 						phys.velocity = Vector2.zero;
 						phys.gravityScale = 0;
 						transitionEndPos = dish.inPoint.position;
@@ -111,11 +113,11 @@ public class PlayerController : MonoBehaviour
 			//scaleFactor = Mathf.Max (0.25f, Vector3.Distance (this.transform.position, transitionEndPos) / transitionStartDistance);
 			//this.transform.localScale = new Vector3 (scaleFactor, scaleFactor, 1f);
 			if (this.transform.position == transitionEndPos) {
-				transitionEndPos = dish.outPoint.position;
+				transitionEndPos = dish.transPoint.position;
 				transitionStartPos = transform.position;
 				//transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
 				//transitionTravelDis = transitionStartDistance / enterDishTime;
-				transTimer = enterDishTime;
+				transTimer = transmissionTime;
 				state = PlayerState.Transition2;
 				//animator.Play ();
 			} else {
@@ -124,17 +126,17 @@ public class PlayerController : MonoBehaviour
 			break;
 
 		case PlayerState.Transition2:
-			lerpRate = Mathf.Min(1f, 1f - transTimer / enterDishTime);
+			lerpRate = Mathf.Min(1f, 1f - transTimer / transmissionTime);
 			this.transform.position = new Vector3 (Mathf.Lerp (transitionStartPos.x, transitionEndPos.x, lerpRate), Mathf.Lerp (transitionStartPos.y, transitionEndPos.y, lerpRate), 0);
 			//this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos , transitionTravelDis * Time.deltaTime);
 			//this.transform.position = new Vector3 (transform.position.x, transform.position.y, 1f);
 			if ((Vector2)this.transform.position == (Vector2)transitionEndPos) {
-				transitionEndPos = dish.transPoint.position;
+				transitionEndPos = dish.outPoint.position;
 				transitionStartPos = transform.position;
 				//transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
 				//transitionTravelDis = transitionStartDistance / transmissionTime ;
 				//Camera.main.GetComponent<FollowCam> ().enabled = false;
-				transTimer = transmissionTime;
+				transTimer = enterDishTime;
 				state = PlayerState.Transition3;
 			}
 			else {
@@ -144,43 +146,6 @@ public class PlayerController : MonoBehaviour
 
 
 		case PlayerState.Transition3:
-			lerpRate = Mathf.Min(1f, 1f - transTimer / transmissionTime);
-			this.transform.position = new Vector3 (Mathf.Lerp (transitionStartPos.x, transitionEndPos.x, lerpRate), Mathf.Lerp (transitionStartPos.y, transitionEndPos.y, lerpRate), 0);
-			//this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos, transitionTravelDis * Time.deltaTime);
-			//this.transform.position = new Vector3 (transform.position.x, transform.position.y, 2f);
-			if ((Vector2)this.transform.position == (Vector2)transitionEndPos) {
-				transitionEndPos = dish.inPoint.position;
-				transitionStartPos = transform.position;
-				//transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
-				//transitionTravelDis = transitionStartDistance / enterDishTime;
-				transTimer = enterDishTime;
-				state = PlayerState.Transition4;
-			}
-			else{
-				transTimer -= Time.deltaTime;
-			}
-			break;
-
-		case PlayerState.Transition4:
-			lerpRate = Mathf.Min(1, 1 - transTimer / enterDishTime);
-			this.transform.position = new Vector3 (Mathf.Lerp (transitionStartPos.x, transitionEndPos.x, lerpRate), Mathf.Lerp (transitionStartPos.y, transitionEndPos.y, lerpRate), 0);
-			//this.transform.position = new Vector3 (transform.position.x, transform.position.y, 1f);
-			if ((Vector2)this.transform.position == (Vector2)transitionEndPos){
-				transitionEndPos = dish.outPoint.position;
-				transitionStartPos = transform.position;
-				//transitionStartDistance = Vector3.Distance (this.transform.position, transitionEndPos);
-				//transitionTravelDis = transitionStartDistance / enterDishTime;
-				//this.transform.position = new Vector3 (transform.position.x, transform.position.y, 0f);
-				transTimer = enterDishTime;
-				state = PlayerState.Transition5;
-			}
-			else{
-				transTimer -= Time.deltaTime;
-			}
-			break;
-
-
-		case PlayerState.Transition5:
 			lerpRate = Mathf.Min (1, 1 - transTimer / enterDishTime);
 			this.transform.position = new Vector3 (Mathf.Lerp (transitionStartPos.x, transitionEndPos.x, lerpRate), Mathf.Lerp (transitionStartPos.y, transitionEndPos.y, lerpRate), 0);
 			//this.transform.position = Vector2.MoveTowards ((Vector2)this.transform.position, (Vector2)transitionEndPos, transitionTravelDis * Time.deltaTime);
@@ -344,12 +309,16 @@ public class PlayerController : MonoBehaviour
 	}
 
 	public void SetInSignal(bool isIn){
-		inWifiRange = isIn;
-		if (!inTransitionRange) {
-			if (isIn) {
-				this.gameObject.GetComponent<SpriteRenderer> ().color = Color.cyan;
-			} else {
-				this.gameObject.GetComponent<SpriteRenderer> ().color = Color.white;
+		if (inWifiRange && isIn) {
+			ignoreExit++;
+		} else {
+			inWifiRange = isIn;
+			if (!inTransitionRange) {
+				if (isIn) {
+					this.gameObject.GetComponent<SpriteRenderer> ().color = Color.cyan;
+				} else {
+					this.gameObject.GetComponent<SpriteRenderer> ().color = Color.white;
+				}
 			}
 		}
 	}
@@ -381,11 +350,13 @@ public class PlayerController : MonoBehaviour
 
 	void OnTriggerExit2D(Collider2D other){
 		if (other.gameObject.tag == "Signal") {
-			if (!gameObject.GetComponent<CapsuleCollider2D> ().IsTouchingLayers (10)) {
+			Debug.Log ("Exited Signal");
+			ignoreExit--;
+			if (ignoreExit <= 0) {
 				SetInSignal (false);
 			}
 		} else if(other.gameObject.tag == "EmiterSwitch"){
-			if(!gameObject.GetComponent<CapsuleCollider2D> ().IsTouchingLayers (11)){
+			if(!gameObject.GetComponent<Collider2D> ().IsTouchingLayers (11)){
 				LeaveSwitch();
 			}
 		}

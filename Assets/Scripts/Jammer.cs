@@ -8,9 +8,15 @@ public class Jammer : MonoBehaviour {
 	public bool active = true;
 
 	private CircleCollider2D circleCollider;
+	private Animator animator;
+	private SpriteRenderer sRenderer;
 
 	// Use this for initialization
 	void Start () {
+		animator = gameObject.GetComponent<Animator> ();
+		animator.enabled = active;
+		sRenderer = gameObject.GetComponent<SpriteRenderer> ();
+		sRenderer.enabled = active;
 		circleCollider = this.gameObject.GetComponent<CircleCollider2D> ();
 		circleCollider.enabled = active;
 	}
@@ -34,7 +40,7 @@ public class Jammer : MonoBehaviour {
 		List<Jammer> jammers = new List<Jammer>();
 		Debug.Log (jammerObjects.Length);
 		for(int x = 0; x < jammerObjects.Length; x++) {
-			if (jammerObjects [x].GetComponent<Signal> ().id == jammerId) {
+			if (jammerObjects [x].GetComponent<Jammer> ().id == jammerId) {
 				jammers.Add(jammerObjects [x].GetComponent<Jammer> ());
 			}
 		}
@@ -45,6 +51,8 @@ public class Jammer : MonoBehaviour {
 	public void SetActive(bool isActive){
 		active = isActive;
 		circleCollider.enabled = isActive;
+		sRenderer.enabled = active;
+		animator.enabled = active;
 	}
 
 	void OnTriggerEnter2D(Collider2D other){

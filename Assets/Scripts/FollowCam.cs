@@ -23,7 +23,7 @@ public class FollowCam : MonoBehaviour {
 	private bool returning = false;
 
     void Awake()
-    {
+	{
 		minXY = new Vector2(minX, minY);
         S = this;
         camZ = transform.position.z;

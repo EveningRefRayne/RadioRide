@@ -8,6 +8,9 @@ public class EmiterSwitch : MonoBehaviour {
 	public int id;
 	public bool active = true;
 
+	public Sprite onSprite;
+	public Sprite offSprite;
+
 	//is turned on
 	private bool playerOver = false;
 
@@ -32,10 +35,13 @@ public class EmiterSwitch : MonoBehaviour {
 		foreach(Signal sig in Signal.FindSignalsById(id)){
 			sig.SetActive (!active);
 		}
+		foreach(Jammer jam in Jammer.FindJammersById(id)){
+			jam.SetActive (!active);
+		}
 		if (active) {
-			this.gameObject.GetComponent<SpriteRenderer> ().color = Color.magenta;
+			this.gameObject.GetComponent<SpriteRenderer> ().sprite = onSprite;
 		} else {
-			this.gameObject.GetComponent<SpriteRenderer> ().color = Color.black;
+			this.gameObject.GetComponent<SpriteRenderer> ().sprite = offSprite;
 		}
 	}
 

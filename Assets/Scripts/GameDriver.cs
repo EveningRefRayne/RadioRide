@@ -14,11 +14,19 @@ public class GameDriver : MonoBehaviour {
 	private static float buttonBuffer = 0.5f;
 	private static float bufferTimer = 0f;
 
+	public Vector3 cameraPos = Vector3.zero;
+	public float cameraSize = 0f;
+
 	void Awake(){
 		if (!_gameDriver) {
 			_gameDriver = this;
 		} else {
 			GameObject.Destroy (this.gameObject);
+		}
+		if (currentLevel > 0) {
+			Debug.Log ("Yes");
+			Camera.main.transform.position = cameraPos;
+			Camera.main.orthographicSize = cameraSize;
 		}
 	}
 
@@ -45,7 +53,7 @@ public class GameDriver : MonoBehaviour {
 	}
 			
 	public void ReloadLevel(){
-		SceneManager.LoadScene (levels [currentLevel]);
+		SceneManager.LoadScene (SceneManager.GetActiveScene().name);
 	}
 
 	public void GoToNextLevel(){

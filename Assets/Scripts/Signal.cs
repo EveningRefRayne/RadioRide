@@ -7,11 +7,17 @@ public class Signal : MonoBehaviour {
 	public int id;
 	public bool active = true;
 
+	private Animator animator;
+	private SpriteRenderer sRenderer;
 	private CircleCollider2D circleCollider;
 	private bool inRange = false;
 
 	// Use this for initialization
 	void Start () {
+		animator = gameObject.GetComponent<Animator> ();
+		animator.enabled = active;
+		sRenderer = gameObject.GetComponent<SpriteRenderer> ();
+		sRenderer.enabled = active;
 		circleCollider = this.gameObject.GetComponent<CircleCollider2D> ();
 		circleCollider.enabled = active;
 	}
@@ -46,6 +52,8 @@ public class Signal : MonoBehaviour {
 	public void SetActive(bool isActive){
 		active = isActive;
 		circleCollider.enabled = isActive;
+		sRenderer.enabled = active;
+		animator.enabled = active;
 	}
 
 	public void SetInRange(bool rangeSet){
