@@ -67,7 +67,9 @@ public class PlayerController : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
-		this.transform.position = startPoint.position;
+		if (startPoint != null) {
+			this.transform.position = startPoint.position;
+		}
 		gameDriver = GameObject.FindGameObjectWithTag ("GameController").GetComponent<GameDriver> ();
         //phys = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
