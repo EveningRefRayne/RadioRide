@@ -7,7 +7,8 @@ public class GameDriver : MonoBehaviour {
 
 	private static GameDriver _gameDriver;
 
-	public string[] levels;
+	//public string[] levels;
+	public int levelCount = 4;
 	public int currentLevel = 0;
 
 	private static bool resetPressed = false;
@@ -58,10 +59,11 @@ public class GameDriver : MonoBehaviour {
 
 	public void GoToNextLevel(){
 		currentLevel++;
-		if (currentLevel >= levels.Length) {
+		if (currentLevel >= levelCount) {
 			currentLevel = 0;
+			//TODO:load final
 		}
-		SceneManager.LoadScene (levels [currentLevel]);
+		SceneManager.LoadScene ("Level" + currentLevel);
 	}
 
 }
