@@ -46,14 +46,14 @@ public class EmiterSwitch : MonoBehaviour {
 	}
 
 	void OnTriggerEnter2D(Collider2D other){
-		if (other.gameObject.tag == "Player" && active) {
+		if (other.gameObject.tag == "Player") {
 			//TODO: replace this with player controller
 			other.GetComponent<PlayerController> ().SetSwitch (this);
 		}
 	}
 
 	void OnTriggerExit2D(Collider2D other){
-		if (other.gameObject.tag == "Player" && active) {
+		if (other.gameObject.tag == "Player") {
 			//TODO: replace this with player controller
 			other.GetComponent<PlayerController> ().LeaveSwitch ();
 		}

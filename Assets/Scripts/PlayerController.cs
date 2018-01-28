@@ -92,6 +92,11 @@ public class PlayerController : MonoBehaviour
 					selectIsDown = true;
 					if (inTransitionRange) {
 						Debug.Log ("TRANSMIT");
+						if (gameDriver.currentLevel == gameDriver.levelCount) {
+							Camera.main.GetComponent<FollowCam> ().enabled = false;
+							Camera.main.transform.parent = this.transform;
+							Camera.main.transform.localPosition = new Vector3 (0, 0, -10);
+						}
 						phys.velocity = Vector2.zero;
 						phys.gravityScale = 0;
 						transitionEndPos = dish.inPoint.position;

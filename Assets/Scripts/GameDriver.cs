@@ -63,7 +63,11 @@ public class GameDriver : MonoBehaviour {
 			currentLevel = 1;
 			//TODO:load final
 		}
-		SceneManager.LoadScene ("Level" + currentLevel);
+		if (currentLevel == 4) {
+			SceneManager.LoadScene ("LevelX");
+		} else {
+			SceneManager.LoadScene ("Level" + currentLevel);
+		}
 	}
 
 }
